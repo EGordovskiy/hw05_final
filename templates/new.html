@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %} Новая запись {% endblock %}
+{% block content %}
+     <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p> {{ form.as_p }} </p>    
+            <div class="col-md-6 offset-md-4">              
+                <button type="submit" class="btn btn-primary">
+                    Опубликовать
+                </button>
+            </div>
+    </form>
+    
+
+{% endblock content %}

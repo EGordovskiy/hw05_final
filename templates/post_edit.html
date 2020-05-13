@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %} Редактирование записи {{group.title}} {% endblock %}
+{% block content %}
+    <h1> Редактировать запись </h1>
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+        <div class="col-md-6 offset-md-4">              
+                <button type="submit" class="btn btn-primary">
+                    Сохранить
+                </button>
+            </div>
+    </form>
+{% endblock %}
