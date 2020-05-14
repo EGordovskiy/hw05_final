@@ -110,8 +110,6 @@ class TestImages(TestCase):
         #self.assertContains(self.response_post, "<img")
         self.assertEqual(self.post_create_image.status_code, 200)
     
-
-
     def test_have_images(self):
         self.assertContains(self.response_profile, "<img")
         self.assertContains(self.response_index, "<img")
@@ -146,6 +144,7 @@ class TestCache(TestCase):
         response_post_create = self.client.post("/new/", {"text" : self.testtext1}, follow=True)
         #Проверяем создание поста
         self.assertEqual(response_post_create.status_code, 200)
+        #Проверяем работу кэша
         key = make_template_fragment_key('index_page')
         response_cache = cache.get(key)
         self.assertTrue(self.response_index, response_cache)
