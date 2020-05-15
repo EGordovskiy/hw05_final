@@ -76,6 +76,36 @@ class TestNonAutorizedUser(TestCase):
 
 
 
+class TestCache(TestCase):
+    testusername = 'testuser'
+    testtext1 = 'testtext1'
+    testemail = 'testemail@ya.ru'
+    password = 'yac@q765490'
+    client = Client()
+
+    def setUp(self):
+        #Регистрируем пользователя, логиним
+        self.response_signup = self.client.post(
+                "/auth/signup/", {"username": self.testusername, "email": self.testemail, 
+                "password1": self.password, "password2": self.password}, follow=True
+            )
+        self.response_login = self.client.post(
+                "/auth/login/", {"username": self.testusername, "password": self.password}, follow=True
+            )
+        self.response_index = self.client.get("/")
+
+    def test_cache_index(self):
+        #Создаем пост
+        response_post_create = self.client.post("/new/", {"text" : self.testtext1}, follow=True)
+        #Проверяем создание поста
+        self.assertEqual(response_post_create.status_code, 200)
+        #Проверяем работу кэша
+        key = make_template_fragment_key('index_page')
+        response_cache = cache.get(key)
+        self.assertTrue(self.response_index, response_cache)
+
+
+        
 class TestImages(TestCase):
     testusername = 'userimage'
     testtext1 = 'testtext1'
@@ -119,33 +149,4 @@ class TestImages(TestCase):
         with open('media/posts/text_file.txt', 'rb') as fp:
             response = self.client.post('/new/', {'text': self.testtext1, 'image': fp}, follow=True)
             self.assertContains(response, 'Upload a valid image. The file you uploaded was either not an image or a corrupted image.')
-
-
-class TestCache(TestCase):
-    testusername = 'testuser'
-    testtext1 = 'testtext1'
-    testemail = 'testemail@ya.ru'
-    password = 'yac@q765490'
-    client = Client()
-
-    def setUp(self):
-        #Регистрируем пользователя, логиним
-        self.response_signup = self.client.post(
-                "/auth/signup/", {"username": self.testusername, "email": self.testemail, 
-                "password1": self.password, "password2": self.password}, follow=True
-            )
-        self.response_login = self.client.post(
-                "/auth/login/", {"username": self.testusername, "password": self.password}, follow=True
-            )
-        self.response_index = self.client.get("/")
-
-    def test_cache_index(self):
-        #Создаем пост
-        response_post_create = self.client.post("/new/", {"text" : self.testtext1}, follow=True)
-        #Проверяем создание поста
-        self.assertEqual(response_post_create.status_code, 200)
-        #Проверяем работу кэша
-        key = make_template_fragment_key('index_page')
-        response_cache = cache.get(key)
-        self.assertTrue(self.response_index, response_cache)
 
