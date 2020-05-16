@@ -125,6 +125,11 @@ class TestImages(TestCase):
             )
         #Создают новый пост
         self.response_create_post = self.client.post("/new/", {"text": self.testtext1}, follow=True)
+
+        with open('media/posts/ozero.jpg', 'rb') as fp:
+            self.post_edit = self.client.post(
+                "/userimage/1/edit/", {"text": self.testtext2, "image": fp}
+            )
         self.response_profile = self.client.get("/userimage/")
         self.response_post = self.client.get("/userimage/1/")
         self.response_index = self.client.get("/")
@@ -132,12 +137,8 @@ class TestImages(TestCase):
     def test_post_with_image(self):
         # Редактирую пост и вставляю в него картинку
         self.assertEqual(self.response_create_post.status_code, 200)
-        with open('media/posts/ozero.jpg', 'rb') as image:
-            post_edit = self.client.post(
-                    "/userimage/1/edit", {"text": self.testtext2, "image": image}
-                )
         # На всякий случай проверяю, отредактировался ли пост
-        self.assertEqual(post_edit.status_code, 301)
+        self.assertEqual(self.post_edit.status_code, 302)
         # Проверяю наличие тега "<img" на странице отредактированного поста с кодом ответа 200
         self.assertContains(self.response_post, "<img", status_code=200)
     
